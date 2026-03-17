@@ -12,7 +12,8 @@
       "Bash(git branch:*)",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "Bash(git commit --amend -m \"$\\(cat <<''EOF''\nLuna Jewelry - Minimalist Gold Headless Shopify Store\n\n- Remix + Vite + Tailwind CSS setup\n- Minimalist gold jewelry aesthetic \\(no stones, no pearls\\)\n- Homepage with hero, featured products, about section\n- Collection pages with filtering\n- Product detail pages\n- Cart functionality\n- Connected to Shopify Storefront API\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit --amend -m \"$\\(cat <<''EOF''\nLuna Jewelry - Minimalist Gold Headless Shopify Store\n\n- Remix + Vite + Tailwind CSS setup\n- Minimalist gold jewelry aesthetic \\(no stones, no pearls\\)\n- Homepage with hero, featured products, about section\n- Collection pages with filtering\n- Product detail pages\n- Cart functionality\n- Connected to Shopify Storefront API\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit:*)"
     ]
   }
 }

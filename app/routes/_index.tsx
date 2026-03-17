@@ -136,7 +136,7 @@ function AboutSection() {
       <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
         <div>
           <img
-            src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=800&q=80"
+            src="https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800&q=80"
             alt="Gold jewelry craftsmanship"
             className="w-full aspect-[4/5] object-cover"
           />
