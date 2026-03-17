@@ -1,15 +1,29 @@
-import {Link} from '@remix-run/react';
+import {Link, useLoaderData} from '@remix-run/react';
 import type {MetaFunction} from '@remix-run/node';
+import {shopifyFetch, PRODUCTS_QUERY, formatPrice, type ProductsResponse, type ShopifyProduct} from '~/lib/shopify';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Luna Jewelry | Timeless Elegance'}];
 };
 
+export async function loader() {
+  try {
+    const data = await shopifyFetch<ProductsResponse>(PRODUCTS_QUERY, {first: 8});
+    const products = data.products.edges.map(edge => edge.node);
+    return {products, error: null};
+  } catch (error) {
+    console.error('Failed to fetch products:', error);
+    return {products: [], error: 'Failed to load products'};
+  }
+}
+
 export default function Homepage() {
+  const {products} = useLoaderData<typeof loader>();
+
   return (
     <>
       <Hero />
-      <FeaturedProducts />
+      <FeaturedProducts products={products} />
       <AboutSection />
       <Newsletter />
     </>
@@ -43,37 +57,19 @@ function Hero() {
   );
 }
 
-function FeaturedProducts() {
-  const products = [
-    {
-      id: 'snake-chain-necklace',
-      name: 'Snake Chain Necklace',
-      price: '$185',
-      image: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=600&q=80',
-      category: 'Necklaces',
-    },
-    {
-      id: 'stackable-rings',
-      name: 'Minimalist Ring Set',
-      price: '$145',
-      image: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&q=80',
-      category: 'Rings',
-    },
-    {
-      id: 'gold-hoops',
-      name: 'Classic Gold Hoops',
-      price: '$125',
-      image: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=600&q=80',
-      category: 'Earrings',
-    },
-    {
-      id: 'chain-bracelet',
-      name: 'Delicate Chain Bracelet',
-      price: '$95',
-      image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80',
-      category: 'Bracelets',
-    },
-  ];
+function FeaturedProducts({products}: {products: ShopifyProduct[]}) {
+  if (products.length === 0) {
+    return (
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="font-heading text-4xl tracking-wider text-charcoal mb-4">
+            Featured Pieces
+          </h2>
+          <p className="text-warm-gray font-light">Coming soon...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-24 px-6">
@@ -86,24 +82,8 @@ function FeaturedProducts() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product, index) => (
-            <Link
-              key={product.id}
-              to={`/products/${product.id}`}
-              className="product-card group"
-              style={{animationDelay: `${index * 100}ms`}}
-            >
-              <div className="aspect-square overflow-hidden bg-cream mb-4">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700"
-                />
-              </div>
-              <p className="text-xs text-warm-gray tracking-wider mb-1">{product.category}</p>
-              <h3 className="font-heading text-lg text-charcoal mb-1">{product.name}</h3>
-              <p className="text-sm text-charcoal">{product.price}</p>
-            </Link>
+          {products.slice(0, 4).map((product, index) => (
+            <ProductCard key={product.id} product={product} index={index} />
           ))}
         </div>
 
@@ -117,6 +97,36 @@ function FeaturedProducts() {
         </div>
       </div>
     </section>
+  );
+}
+
+function ProductCard({product, index}: {product: ShopifyProduct; index: number}) {
+  const image = product.images.edges[0]?.node;
+  const price = formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode);
+
+  return (
+    <Link
+      to={`/products/${product.handle}`}
+      className="product-card group"
+      style={{animationDelay: `${index * 100}ms`}}
+    >
+      <div className="aspect-square overflow-hidden bg-cream mb-4">
+        {image ? (
+          <img
+            src={image.url}
+            alt={image.altText || product.title}
+            className="w-full h-full object-cover transition-transform duration-700"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-warm-gray">
+            No image
+          </div>
+        )}
+      </div>
+      <p className="text-xs text-warm-gray tracking-wider mb-1">{product.productType || 'Jewelry'}</p>
+      <h3 className="font-heading text-lg text-charcoal mb-1">{product.title}</h3>
+      <p className="text-sm text-charcoal">{price}</p>
+    </Link>
   );
 }
 

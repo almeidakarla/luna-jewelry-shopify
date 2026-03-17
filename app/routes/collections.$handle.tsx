@@ -1,79 +1,14 @@
 import {Link, useLoaderData} from '@remix-run/react';
 import type {LoaderFunctionArgs, MetaFunction} from '@remix-run/node';
-
-// Minimalist gold jewelry - no stones, no pearls, just pure gold
-const MOCK_PRODUCTS = [
-  {
-    id: 'snake-chain-necklace',
-    name: 'Snake Chain Necklace',
-    price: '$185',
-    image: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=600&q=80',
-    category: 'Necklaces',
-  },
-  {
-    id: 'herringbone-chain',
-    name: 'Herringbone Chain',
-    price: '$225',
-    image: 'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=600&q=80',
-    category: 'Necklaces',
-  },
-  {
-    id: 'layered-chains',
-    name: 'Layered Chain Set',
-    price: '$265',
-    image: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&q=80',
-    category: 'Necklaces',
-  },
-  {
-    id: 'stackable-rings',
-    name: 'Minimalist Ring Set',
-    price: '$145',
-    image: 'https://images.unsplash.com/photo-1603561596112-0a132b757442?w=600&q=80',
-    category: 'Rings',
-  },
-  {
-    id: 'thin-band-ring',
-    name: 'Thin Band Ring',
-    price: '$85',
-    image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=80',
-    category: 'Rings',
-  },
-  {
-    id: 'chain-link-ring',
-    name: 'Chain Link Ring',
-    price: '$125',
-    image: 'https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?w=600&q=80',
-    category: 'Rings',
-  },
-  {
-    id: 'gold-hoops',
-    name: 'Classic Gold Hoops',
-    price: '$125',
-    image: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=600&q=80',
-    category: 'Earrings',
-  },
-  {
-    id: 'twisted-hoops',
-    name: 'Twisted Gold Hoops',
-    price: '$155',
-    image: 'https://images.unsplash.com/photo-1635767798638-3e25273a8236?w=600&q=80',
-    category: 'Earrings',
-  },
-  {
-    id: 'chain-bracelet',
-    name: 'Delicate Chain Bracelet',
-    price: '$95',
-    image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80',
-    category: 'Bracelets',
-  },
-  {
-    id: 'cuff-bracelet',
-    name: 'Gold Cuff Bracelet',
-    price: '$175',
-    image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&q=80',
-    category: 'Bracelets',
-  },
-];
+import {
+  shopifyFetch,
+  PRODUCTS_QUERY,
+  COLLECTION_BY_HANDLE_QUERY,
+  formatPrice,
+  type ProductsResponse,
+  type CollectionResponse,
+  type ShopifyProduct,
+} from '~/lib/shopify';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `${data?.collectionTitle || 'Collection'} | Luna Jewelry`}];
@@ -82,25 +17,59 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
 export async function loader({params}: LoaderFunctionArgs) {
   const handle = params.handle || 'all';
 
-  const collectionMap: Record<string, string> = {
-    all: 'All Jewelry',
-    necklaces: 'Necklaces',
-    rings: 'Rings',
-    bracelets: 'Bracelets',
-    earrings: 'Earrings',
-  };
+  try {
+    if (handle === 'all') {
+      // Fetch all products
+      const data = await shopifyFetch<ProductsResponse>(PRODUCTS_QUERY, {first: 50});
+      const products = data.products.edges.map(edge => edge.node);
+      return {
+        collectionTitle: 'All Jewelry',
+        products,
+        error: null,
+      };
+    } else {
+      // Try to fetch collection by handle
+      const data = await shopifyFetch<CollectionResponse>(COLLECTION_BY_HANDLE_QUERY, {
+        handle,
+        first: 50,
+      });
 
-  const collectionTitle = collectionMap[handle] || 'Collection';
+      if (data.collectionByHandle) {
+        const products = data.collectionByHandle.products.edges.map(edge => edge.node);
+        return {
+          collectionTitle: data.collectionByHandle.title,
+          products,
+          error: null,
+        };
+      }
 
-  const products = handle === 'all'
-    ? MOCK_PRODUCTS
-    : MOCK_PRODUCTS.filter(p => p.category.toLowerCase() === handle);
+      // If no collection found, filter all products by type
+      const allData = await shopifyFetch<ProductsResponse>(PRODUCTS_QUERY, {first: 50});
+      const filteredProducts = allData.products.edges
+        .map(edge => edge.node)
+        .filter(p => p.productType.toLowerCase() === handle.toLowerCase());
 
-  return {
-    handle,
-    collectionTitle,
-    products,
-  };
+      const titleMap: Record<string, string> = {
+        necklaces: 'Necklaces',
+        rings: 'Rings',
+        bracelets: 'Bracelets',
+        earrings: 'Earrings',
+      };
+
+      return {
+        collectionTitle: titleMap[handle] || handle.charAt(0).toUpperCase() + handle.slice(1),
+        products: filteredProducts,
+        error: null,
+      };
+    }
+  } catch (error) {
+    console.error('Failed to fetch collection:', error);
+    return {
+      collectionTitle: 'Collection',
+      products: [],
+      error: 'Failed to load products',
+    };
+  }
 }
 
 export default function Collection() {
@@ -120,7 +89,7 @@ export default function Collection() {
 
         {products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {products.map((product, index) => (
+            {products.map((product: ShopifyProduct, index: number) => (
               <ProductCard key={product.id} product={product} index={index} />
             ))}
           </div>
@@ -134,31 +103,35 @@ export default function Collection() {
   );
 }
 
-interface Product {
-  id: string;
-  name: string;
-  price: string;
-  image: string;
-  category: string;
-}
+function ProductCard({product, index}: {product: ShopifyProduct; index: number}) {
+  const image = product.images.edges[0]?.node;
+  const price = formatPrice(
+    product.priceRange.minVariantPrice.amount,
+    product.priceRange.minVariantPrice.currencyCode
+  );
 
-function ProductCard({product, index}: {product: Product; index: number}) {
   return (
     <Link
-      to={`/products/${product.id}`}
+      to={`/products/${product.handle}`}
       className="product-card group animate-fade-up"
       style={{animationDelay: `${index * 50}ms`}}
     >
       <div className="aspect-square overflow-hidden bg-cream mb-4">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+        {image ? (
+          <img
+            src={image.url}
+            alt={image.altText || product.title}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-warm-gray">
+            No image
+          </div>
+        )}
       </div>
-      <p className="text-xs text-warm-gray tracking-wider mb-1">{product.category}</p>
-      <h3 className="font-heading text-lg text-charcoal mb-1">{product.name}</h3>
-      <p className="text-sm text-charcoal">{product.price}</p>
+      <p className="text-xs text-warm-gray tracking-wider mb-1">{product.productType || 'Jewelry'}</p>
+      <h3 className="font-heading text-lg text-charcoal mb-1">{product.title}</h3>
+      <p className="text-sm text-charcoal">{price}</p>
     </Link>
   );
 }
