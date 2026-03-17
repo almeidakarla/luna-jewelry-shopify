@@ -53,13 +53,35 @@ function Header({menuItems}: {menuItems: MenuItem[]}) {
   };
 
   return (
-    <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-gold/10">
-        <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="font-heading text-2xl tracking-widest text-charcoal">
-            LUNA
-          </Link>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-gold/10">
+      <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <Link to="/" className="font-heading text-2xl tracking-widest text-charcoal">
+          LUNA
+        </Link>
 
+        {searchOpen ? (
+          <form onSubmit={handleSearch} className="flex-1 mx-8 flex items-center gap-4">
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search for jewelry..."
+              autoFocus
+              className="flex-1 px-4 py-2 bg-transparent border border-charcoal/20 text-charcoal placeholder:text-warm-gray focus:outline-none focus:border-gold transition-colors text-sm"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setSearchOpen(false);
+                setSearchQuery('');
+              }}
+              className="text-charcoal hover:text-gold transition-colors"
+              aria-label="Close search"
+            >
+              <CloseIcon />
+            </button>
+          </form>
+        ) : (
           <div className="hidden md:flex items-center gap-10">
             {menuItems.map((item) => (
               <NavLink key={item.id} to={shopifyUrlToPath(item.url)}>
@@ -67,8 +89,10 @@ function Header({menuItems}: {menuItems: MenuItem[]}) {
               </NavLink>
             ))}
           </div>
+        )}
 
-          <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6">
+          {!searchOpen && (
             <button
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
@@ -76,45 +100,19 @@ function Header({menuItems}: {menuItems: MenuItem[]}) {
             >
               <SearchIcon />
             </button>
-            <Link to="/cart" aria-label="Cart" className="text-charcoal hover:text-gold transition-colors">
-              <CartIcon />
-            </Link>
-          </div>
-        </nav>
-      </header>
-
-      {/* Search Overlay */}
-      {searchOpen && (
-        <div className="fixed inset-0 z-[100] bg-cream/98 backdrop-blur-sm">
-          <div className="max-w-2xl mx-auto px-6 pt-32">
-            <button
-              onClick={() => setSearchOpen(false)}
-              className="absolute top-6 right-6 text-charcoal hover:text-gold transition-colors"
-              aria-label="Close search"
-            >
-              <CloseIcon />
-            </button>
-            <form onSubmit={handleSearch}>
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for jewelry..."
-                autoFocus
-                className="w-full px-0 py-4 bg-transparent border-b-2 border-charcoal/20 text-2xl text-charcoal placeholder:text-warm-gray focus:outline-none focus:border-gold transition-colors font-heading tracking-wider"
-              />
-            </form>
-            <p className="text-warm-gray text-sm mt-4">Press Enter to search</p>
-          </div>
+          )}
+          <Link to="/cart" aria-label="Cart" className="text-charcoal hover:text-gold transition-colors">
+            <CartIcon />
+          </Link>
         </div>
-      )}
-    </>
+      </nav>
+    </header>
   );
 }
 
 function CloseIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
       <line x1="18" y1="6" x2="6" y2="18" />
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
