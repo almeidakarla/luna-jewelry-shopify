@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-body text-charcoal bg-cream antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-light tracking-wide;
+  }
+}
+
+/* Custom utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Hover effects for product cards */
+@layer components {
+  .product-card {
+    @apply transition-all duration-500 ease-out;
+  }
+
+  .product-card:hover {
+    @apply -translate-y-1 shadow-lg;
+  }
+
+  .product-card:hover img {
+    @apply scale-105;
+  }
+
+  /* Link underline animation */
+  .link-underline {
+    position: relative;
+  }
+
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: theme('colors.gold.DEFAULT');
+    transition: width 0.3s ease-out;
+  }
+
+  .link-underline:hover::after {
+    width: 100%;
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      theme('colors.cream') 0%,
+      theme('colors.gold.light') 50%,
+      theme('colors.cream') 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+}
