@@ -95,20 +95,39 @@ function Hero({products}: {products: ShopifyProduct[]}) {
         </Link>
       </div>
 
-      {/* Carousel Indicators */}
+      {/* Carousel Controls */}
       {heroImages.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-          {heroImages.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentSlide ? 'bg-gold w-6' : 'bg-charcoal/30'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
+        <>
+          {/* Arrow Controls */}
+          <button
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)}
+            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft />
+          </button>
+          <button
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroImages.length)}
+            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
+            aria-label="Next slide"
+          >
+            <ChevronRight />
+          </button>
+
+          {/* Dot Indicators */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+            {heroImages.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === currentSlide ? 'bg-gold w-6' : 'bg-charcoal/30'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </>
       )}
     </section>
   );
@@ -229,5 +248,21 @@ function Newsletter() {
         </form>
       </div>
     </section>
+  );
+}
+
+function ChevronLeft() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  );
+}
+
+function ChevronRight() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M9 18l6-6-6-6" />
+    </svg>
   );
 }
