@@ -6,24 +6,6 @@ export const meta: MetaFunction = () => {
   return [{title: 'Shopping Cart | Luna Jewelry'}];
 };
 
-// Mock cart items for demonstration
-const INITIAL_CART_ITEMS = [
-  {
-    id: 'crescent-necklace',
-    name: 'Crescent Necklace',
-    price: 285,
-    quantity: 1,
-    image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=200&q=80',
-  },
-  {
-    id: 'eternity-ring',
-    name: 'Éternity Ring',
-    price: 195,
-    quantity: 2,
-    image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=200&q=80',
-  },
-];
-
 interface CartItem {
   id: string;
   name: string;
@@ -31,6 +13,9 @@ interface CartItem {
   quantity: number;
   image: string;
 }
+
+// Cart starts empty - items are added when user clicks "Add to Cart"
+const INITIAL_CART_ITEMS: CartItem[] = [];
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState<CartItem[]>(INITIAL_CART_ITEMS);
