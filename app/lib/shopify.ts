@@ -231,10 +231,51 @@ export const COLLECTION_BY_HANDLE_QUERY = `
   }
 `;
 
+// Menu types and query
+export interface MenuItem {
+  id: string;
+  title: string;
+  url: string;
+  items: MenuItem[];
+}
+
+export interface MenuResponse {
+  menu: {
+    items: MenuItem[];
+  } | null;
+}
+
+export const MENU_QUERY = `
+  query Menu($handle: String!) {
+    menu(handle: $handle) {
+      items {
+        id
+        title
+        url
+        items {
+          id
+          title
+          url
+        }
+      }
+    }
+  }
+`;
+
 // Helper to format price
 export function formatPrice(amount: string, currencyCode: string = 'USD'): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currencyCode,
   }).format(parseFloat(amount));
+}
+
+// Helper to convert Shopify URLs to relative paths
+export function shopifyUrlToPath(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.pathname;
+  } catch {
+    return url;
+  }
 }

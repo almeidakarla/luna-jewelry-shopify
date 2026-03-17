@@ -1,21 +1,44 @@
 import {Link} from '@remix-run/react';
 import type {ReactNode} from 'react';
+import {shopifyUrlToPath, type MenuItem} from '~/lib/shopify';
 
 interface LayoutProps {
   children: ReactNode;
+  headerMenu: MenuItem[];
+  footerMenu: MenuItem[];
 }
 
-export function Layout({children}: LayoutProps) {
+// Default menu items as fallback
+const defaultHeaderMenu = [
+  {id: '1', title: 'Shop', url: '/collections/all', items: []},
+  {id: '2', title: 'Necklaces', url: '/collections/necklaces', items: []},
+  {id: '3', title: 'Earrings', url: '/collections/earrings', items: []},
+  {id: '4', title: 'Rings', url: '/collections/rings', items: []},
+  {id: '5', title: 'Bracelets', url: '/collections/bracelets', items: []},
+];
+
+const defaultFooterShopMenu = [
+  {id: '1', title: 'All Jewelry', url: '/collections/all', items: []},
+  {id: '2', title: 'Necklaces', url: '/collections/necklaces', items: []},
+  {id: '3', title: 'Earrings', url: '/collections/earrings', items: []},
+  {id: '4', title: 'Rings', url: '/collections/rings', items: []},
+  {id: '5', title: 'Bracelets', url: '/collections/bracelets', items: []},
+];
+
+export function Layout({children, headerMenu, footerMenu}: LayoutProps) {
+  const navItems = headerMenu.length > 0 ? headerMenu : defaultHeaderMenu;
+  const footerItems = footerMenu.length > 0 ? footerMenu : defaultFooterShopMenu;
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header menuItems={navItems} />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <Footer menuItems={footerItems} />
     </div>
   );
 }
 
-function Header() {
+function Header({menuItems}: {menuItems: MenuItem[]}) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-gold/10">
       <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -24,11 +47,11 @@ function Header() {
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
-          <NavLink to="/collections/all">Shop</NavLink>
-          <NavLink to="/collections/necklaces">Necklaces</NavLink>
-          <NavLink to="/collections/earrings">Earrings</NavLink>
-          <NavLink to="/collections/rings">Rings</NavLink>
-          <NavLink to="/collections/bracelets">Bracelets</NavLink>
+          {menuItems.map((item) => (
+            <NavLink key={item.id} to={shopifyUrlToPath(item.url)}>
+              {item.title}
+            </NavLink>
+          ))}
         </div>
 
         <div className="flex items-center gap-6">
@@ -55,7 +78,7 @@ function NavLink({to, children}: {to: string; children: ReactNode}) {
   );
 }
 
-function Footer() {
+function Footer({menuItems}: {menuItems: MenuItem[]}) {
   return (
     <footer className="bg-charcoal text-cream/80 py-16 mt-20">
       <div className="max-w-7xl mx-auto px-6">
@@ -70,11 +93,13 @@ function Footer() {
           <div>
             <h4 className="text-sm font-body tracking-wider mb-4 text-cream">Shop</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/collections/all" className="hover:text-gold transition-colors">All Jewelry</Link></li>
-              <li><Link to="/collections/necklaces" className="hover:text-gold transition-colors">Necklaces</Link></li>
-              <li><Link to="/collections/earrings" className="hover:text-gold transition-colors">Earrings</Link></li>
-              <li><Link to="/collections/rings" className="hover:text-gold transition-colors">Rings</Link></li>
-              <li><Link to="/collections/bracelets" className="hover:text-gold transition-colors">Bracelets</Link></li>
+              {menuItems.map((item) => (
+                <li key={item.id}>
+                  <Link to={shopifyUrlToPath(item.url)} className="hover:text-gold transition-colors">
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

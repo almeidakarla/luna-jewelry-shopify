@@ -4,11 +4,35 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from '@remix-run/react';
 import {Layout} from '~/components/Layout';
+import {shopifyFetch, MENU_QUERY, type MenuResponse, type MenuItem} from '~/lib/shopify';
 import './styles/tailwind.css';
 
+export async function loader() {
+  try {
+    const [headerData, footerData] = await Promise.all([
+      shopifyFetch<MenuResponse>(MENU_QUERY, {handle: 'main-menu'}),
+      shopifyFetch<MenuResponse>(MENU_QUERY, {handle: 'footer'}),
+    ]);
+
+    return {
+      headerMenu: headerData.menu?.items || [],
+      footerMenu: footerData.menu?.items || [],
+    };
+  } catch (error) {
+    console.error('Failed to fetch menus:', error);
+    return {
+      headerMenu: [],
+      footerMenu: [],
+    };
+  }
+}
+
 export default function App() {
+  const {headerMenu, footerMenu} = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -24,7 +48,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Layout>
+        <Layout headerMenu={headerMenu} footerMenu={footerMenu}>
           <Outlet />
         </Layout>
         <ScrollRestoration />
