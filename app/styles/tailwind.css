@@ -17,15 +17,119 @@
   }
 }
 
-/* Custom utilities */
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
-/* Hover effects for product cards */
+/* Component styles */
 @layer components {
+  /* Layout */
+  .container-page {
+    @apply max-w-7xl mx-auto px-6;
+  }
+
+  .section {
+    @apply py-24 px-6;
+  }
+
+  .page-wrapper {
+    @apply pt-24 min-h-screen;
+  }
+
+  /* Typography */
+  .heading-1 {
+    @apply font-heading text-4xl md:text-5xl tracking-wider text-charcoal;
+  }
+
+  .heading-2 {
+    @apply font-heading text-4xl tracking-wider text-charcoal;
+  }
+
+  .heading-3 {
+    @apply font-heading text-2xl text-charcoal;
+  }
+
+  .heading-4 {
+    @apply text-sm font-body tracking-wider text-charcoal;
+  }
+
+  .text-subtitle {
+    @apply text-warm-gray font-light;
+  }
+
+  .text-label {
+    @apply text-xs text-warm-gray tracking-wider;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply px-8 py-4 text-sm tracking-widest transition-all duration-300;
+  }
+
+  .btn-primary {
+    @apply btn bg-charcoal text-cream hover:bg-gold;
+  }
+
+  .btn-secondary {
+    @apply btn border border-charcoal hover:bg-charcoal hover:text-cream;
+  }
+
+  .btn-outline-light {
+    @apply btn border border-cream/50 hover:bg-cream hover:text-charcoal;
+  }
+
+  .btn-small {
+    @apply px-6 py-3 text-sm tracking-widest transition-all duration-300;
+  }
+
+  /* Form inputs */
+  .input {
+    @apply w-full px-4 py-3 bg-transparent border border-charcoal/20 text-charcoal placeholder:text-warm-gray focus:outline-none focus:border-gold transition-colors;
+  }
+
+  .input-search {
+    @apply flex-1 px-4 py-2 bg-transparent border border-charcoal/20 text-charcoal placeholder:text-warm-gray focus:outline-none focus:border-gold transition-colors text-sm;
+  }
+
+  .input-label {
+    @apply block text-sm tracking-wider text-charcoal mb-2;
+  }
+
+  /* Navigation */
+  .nav-header {
+    @apply fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-gold/10;
+  }
+
+  .nav-container {
+    @apply max-w-7xl mx-auto px-6 py-4 flex items-center justify-between;
+  }
+
+  .nav-logo {
+    @apply font-heading text-2xl tracking-widest text-charcoal;
+  }
+
+  .nav-menu {
+    @apply hidden md:flex items-center gap-10;
+  }
+
+  .nav-link {
+    @apply link-underline text-sm font-body tracking-wider text-warm-gray hover:text-charcoal transition-colors;
+  }
+
+  .nav-icon {
+    @apply text-charcoal hover:text-gold transition-colors;
+  }
+
+  /* Footer */
+  .footer {
+    @apply bg-charcoal text-cream/80 py-16 mt-20;
+  }
+
+  .footer-heading {
+    @apply text-sm font-body tracking-wider mb-4 text-cream;
+  }
+
+  .footer-link {
+    @apply hover:text-gold transition-colors;
+  }
+
+  /* Cards */
   .product-card {
     @apply transition-all duration-500 ease-out;
   }
@@ -36,6 +140,22 @@
 
   .product-card:hover img {
     @apply scale-105;
+  }
+
+  .product-image {
+    @apply aspect-square overflow-hidden bg-cream;
+  }
+
+  .product-image img {
+    @apply w-full h-full object-cover transition-transform duration-700;
+  }
+
+  .product-title {
+    @apply font-heading text-lg text-charcoal mb-1;
+  }
+
+  .product-price {
+    @apply text-sm text-charcoal;
   }
 
   /* Link underline animation */
@@ -58,6 +178,26 @@
     width: 100%;
   }
 
+  /* Quantity controls */
+  .qty-btn {
+    @apply w-10 h-10 border border-charcoal/20 flex items-center justify-center hover:border-charcoal transition-colors;
+  }
+
+  /* Page header */
+  .page-header {
+    @apply text-center mb-16;
+  }
+
+  /* Grid layouts */
+  .product-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8;
+  }
+
+  .product-grid-featured {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8;
+  }
+
+  /* Animations */
   .animate-shimmer {
     background: linear-gradient(
       90deg,
@@ -67,5 +207,48 @@
     );
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    @apply text-sm text-warm-gray mb-8;
+  }
+
+  .breadcrumb a {
+    @apply hover:text-charcoal transition-colors;
+  }
+
+  .breadcrumb-separator {
+    @apply mx-2;
+  }
+
+  /* Details list */
+  .detail-item {
+    @apply text-warm-gray text-sm flex items-center gap-2;
+  }
+
+  .detail-bullet {
+    @apply w-1 h-1 bg-gold rounded-full;
+  }
+
+  /* Empty state */
+  .empty-state {
+    @apply text-center py-16;
+  }
+
+  /* Order summary */
+  .summary-box {
+    @apply bg-cream p-6 border border-charcoal/10;
+  }
+
+  .summary-row {
+    @apply flex justify-between text-sm;
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 }

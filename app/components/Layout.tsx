@@ -8,7 +8,6 @@ interface LayoutProps {
   footerMenu: MenuItem[];
 }
 
-// Default menu items as fallback
 const defaultHeaderMenu = [
   {id: '1', title: 'Shop', url: '/collections/all', items: []},
   {id: '2', title: 'Necklaces', url: '/collections/necklaces', items: []},
@@ -53,11 +52,9 @@ function Header({menuItems}: {menuItems: MenuItem[]}) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-gold/10">
-      <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link to="/" className="font-heading text-2xl tracking-widest text-charcoal">
-          LUNA
-        </Link>
+    <header className="nav-header">
+      <nav className="nav-container">
+        <Link to="/" className="nav-logo">LUNA</Link>
 
         {searchOpen ? (
           <form onSubmit={handleSearch} className="flex-1 mx-8 flex items-center gap-4">
@@ -67,41 +64,34 @@ function Header({menuItems}: {menuItems: MenuItem[]}) {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for jewelry..."
               autoFocus
-              className="flex-1 px-4 py-2 bg-transparent border border-charcoal/20 text-charcoal placeholder:text-warm-gray focus:outline-none focus:border-gold transition-colors text-sm"
+              className="input-search"
             />
             <button
               type="button"
-              onClick={() => {
-                setSearchOpen(false);
-                setSearchQuery('');
-              }}
-              className="text-charcoal hover:text-gold transition-colors"
+              onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
+              className="nav-icon"
               aria-label="Close search"
             >
               <CloseIcon />
             </button>
           </form>
         ) : (
-          <div className="hidden md:flex items-center gap-10">
+          <div className="nav-menu">
             {menuItems.map((item) => (
-              <NavLink key={item.id} to={shopifyUrlToPath(item.url)}>
+              <Link key={item.id} to={shopifyUrlToPath(item.url)} className="nav-link">
                 {item.title}
-              </NavLink>
+              </Link>
             ))}
           </div>
         )}
 
         <div className="flex items-center gap-6">
           {!searchOpen && (
-            <button
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-              className="text-charcoal hover:text-gold transition-colors"
-            >
+            <button onClick={() => setSearchOpen(true)} aria-label="Search" className="nav-icon">
               <SearchIcon />
             </button>
           )}
-          <Link to="/cart" aria-label="Cart" className="text-charcoal hover:text-gold transition-colors">
+          <Link to="/cart" aria-label="Cart" className="nav-icon">
             <CartIcon />
           </Link>
         </div>
@@ -110,30 +100,10 @@ function Header({menuItems}: {menuItems: MenuItem[]}) {
   );
 }
 
-function CloseIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
-}
-
-function NavLink({to, children}: {to: string; children: ReactNode}) {
-  return (
-    <Link
-      to={to}
-      className="link-underline text-sm font-body tracking-wider text-warm-gray hover:text-charcoal transition-colors"
-    >
-      {children}
-    </Link>
-  );
-}
-
 function Footer({menuItems}: {menuItems: MenuItem[]}) {
   return (
-    <footer className="bg-charcoal text-cream/80 py-16 mt-20">
-      <div className="max-w-7xl mx-auto px-6">
+    <footer className="footer">
+      <div className="container-page">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-2">
             <h3 className="font-heading text-3xl tracking-widest text-cream mb-4">LUNA</h3>
@@ -143,25 +113,23 @@ function Footer({menuItems}: {menuItems: MenuItem[]}) {
           </div>
 
           <div>
-            <h4 className="text-sm font-body tracking-wider mb-4 text-cream">Shop</h4>
+            <h4 className="footer-heading">Shop</h4>
             <ul className="space-y-2 text-sm">
               {menuItems.map((item) => (
                 <li key={item.id}>
-                  <Link to={shopifyUrlToPath(item.url)} className="hover:text-gold transition-colors">
-                    {item.title}
-                  </Link>
+                  <Link to={shopifyUrlToPath(item.url)} className="footer-link">{item.title}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-body tracking-wider mb-4 text-cream">Info</h4>
+            <h4 className="footer-heading">Info</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/about" className="hover:text-gold transition-colors">Our Story</Link></li>
-              <li><Link to="/care" className="hover:text-gold transition-colors">Jewelry Care</Link></li>
-              <li><Link to="/shipping" className="hover:text-gold transition-colors">Shipping</Link></li>
-              <li><Link to="/contact" className="hover:text-gold transition-colors">Contact</Link></li>
+              <li><Link to="/about" className="footer-link">Our Story</Link></li>
+              <li><Link to="/care" className="footer-link">Jewelry Care</Link></li>
+              <li><Link to="/shipping" className="footer-link">Shipping</Link></li>
+              <li><Link to="/contact" className="footer-link">Contact</Link></li>
             </ul>
           </div>
         </div>
@@ -189,6 +157,15 @@ function CartIcon() {
       <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
       <line x1="3" y1="6" x2="21" y2="6" />
       <path d="M16 10a4 4 0 01-8 0" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   );
 }
