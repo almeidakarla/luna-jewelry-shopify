@@ -131,11 +131,11 @@
 
   /* Cards */
   .product-card {
-    @apply transition-all duration-500 ease-out;
+    @apply transition-all duration-500 ease-out p-4;
   }
 
   .product-card:hover {
-    @apply -translate-y-1 shadow-lg;
+    @apply -translate-y-1 shadow-lg bg-white p-4;
   }
 
   .product-card:hover img {
