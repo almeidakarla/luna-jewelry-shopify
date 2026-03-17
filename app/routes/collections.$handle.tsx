@@ -51,9 +51,9 @@ export async function loader({params}: LoaderFunctionArgs) {
 
       const titleMap: Record<string, string> = {
         necklaces: 'Necklaces',
+        earrings: 'Earrings',
         rings: 'Rings',
         bracelets: 'Bracelets',
-        earrings: 'Earrings',
       };
 
       return {

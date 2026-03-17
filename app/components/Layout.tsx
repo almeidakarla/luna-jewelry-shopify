@@ -26,6 +26,7 @@ function Header() {
         <div className="hidden md:flex items-center gap-10">
           <NavLink to="/collections/all">Shop</NavLink>
           <NavLink to="/collections/necklaces">Necklaces</NavLink>
+          <NavLink to="/collections/earrings">Earrings</NavLink>
           <NavLink to="/collections/rings">Rings</NavLink>
           <NavLink to="/collections/bracelets">Bracelets</NavLink>
         </div>
@@ -71,6 +72,7 @@ function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link to="/collections/all" className="hover:text-gold transition-colors">All Jewelry</Link></li>
               <li><Link to="/collections/necklaces" className="hover:text-gold transition-colors">Necklaces</Link></li>
+              <li><Link to="/collections/earrings" className="hover:text-gold transition-colors">Earrings</Link></li>
               <li><Link to="/collections/rings" className="hover:text-gold transition-colors">Rings</Link></li>
               <li><Link to="/collections/bracelets" className="hover:text-gold transition-colors">Bracelets</Link></li>
             </ul>

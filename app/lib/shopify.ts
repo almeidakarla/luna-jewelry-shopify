@@ -1,5 +1,5 @@
 // Shopify Storefront API client
-const SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || '';
+const SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'luna-jewelry-8739.myshopify.com';
 const SHOPIFY_STOREFRONT_TOKEN = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN || '';
 
 interface ShopifyResponse<T> {
@@ -8,17 +8,26 @@ interface ShopifyResponse<T> {
 }
 
 export async function shopifyFetch<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
-  const response = await fetch(
-    `https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN,
-      },
-      body: JSON.stringify({query, variables}),
-    }
-  );
+  if (!SHOPIFY_STOREFRONT_TOKEN) {
+    console.error('Missing SHOPIFY_STOREFRONT_ACCESS_TOKEN environment variable');
+    throw new Error('Shopify configuration error');
+  }
+
+  const url = `https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN,
+    },
+    body: JSON.stringify({query, variables}),
+  });
+
+  if (!response.ok) {
+    console.error('Shopify API HTTP error:', response.status, response.statusText);
+    throw new Error(`Shopify API error: ${response.status}`);
+  }
 
   const json: ShopifyResponse<T> = await response.json();
 
