@@ -55,9 +55,9 @@ function Header({menuItems}: {menuItems: MenuItem[]}) {
         </div>
 
         <div className="flex items-center gap-6">
-          <button aria-label="Search" className="text-charcoal hover:text-gold transition-colors">
+          <Link to="/search" aria-label="Search" className="text-charcoal hover:text-gold transition-colors">
             <SearchIcon />
-          </button>
+          </Link>
           <Link to="/cart" aria-label="Cart" className="text-charcoal hover:text-gold transition-colors">
             <CartIcon />
           </Link>
