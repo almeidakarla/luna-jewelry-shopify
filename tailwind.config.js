@@ -11,7 +11,7 @@ export default {
         },
         cream: '#faf8f5',
         charcoal: '#2d2d2d',
-        'warm-gray': rgb(34, 31, 28),
+        'warm-gray': 'rgb(34, 31, 28)',
       },
       fontFamily: {
         heading: ['"Cormorant Garamond"', 'Georgia', 'serif'],
