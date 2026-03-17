@@ -1,5 +1,5 @@
-import {Link} from '@remix-run/react';
-import type {ReactNode} from 'react';
+import {Link, useNavigate} from '@remix-run/react';
+import {useState, type ReactNode} from 'react';
 import {shopifyUrlToPath, type MenuItem} from '~/lib/shopify';
 
 interface LayoutProps {
@@ -39,31 +39,85 @@ export function Layout({children, headerMenu, footerMenu}: LayoutProps) {
 }
 
 function Header({menuItems}: {menuItems: MenuItem[]}) {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-gold/10">
-      <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link to="/" className="font-heading text-2xl tracking-widest text-charcoal">
-          LUNA
-        </Link>
-
-        <div className="hidden md:flex items-center gap-10">
-          {menuItems.map((item) => (
-            <NavLink key={item.id} to={shopifyUrlToPath(item.url)}>
-              {item.title}
-            </NavLink>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-6">
-          <Link to="/search" aria-label="Search" className="text-charcoal hover:text-gold transition-colors">
-            <SearchIcon />
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-gold/10">
+        <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="font-heading text-2xl tracking-widest text-charcoal">
+            LUNA
           </Link>
-          <Link to="/cart" aria-label="Cart" className="text-charcoal hover:text-gold transition-colors">
-            <CartIcon />
-          </Link>
+
+          <div className="hidden md:flex items-center gap-10">
+            {menuItems.map((item) => (
+              <NavLink key={item.id} to={shopifyUrlToPath(item.url)}>
+                {item.title}
+              </NavLink>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+              className="text-charcoal hover:text-gold transition-colors"
+            >
+              <SearchIcon />
+            </button>
+            <Link to="/cart" aria-label="Cart" className="text-charcoal hover:text-gold transition-colors">
+              <CartIcon />
+            </Link>
+          </div>
+        </nav>
+      </header>
+
+      {/* Search Overlay */}
+      {searchOpen && (
+        <div className="fixed inset-0 z-[100] bg-cream/98 backdrop-blur-sm">
+          <div className="max-w-2xl mx-auto px-6 pt-32">
+            <button
+              onClick={() => setSearchOpen(false)}
+              className="absolute top-6 right-6 text-charcoal hover:text-gold transition-colors"
+              aria-label="Close search"
+            >
+              <CloseIcon />
+            </button>
+            <form onSubmit={handleSearch}>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search for jewelry..."
+                autoFocus
+                className="w-full px-0 py-4 bg-transparent border-b-2 border-charcoal/20 text-2xl text-charcoal placeholder:text-warm-gray focus:outline-none focus:border-gold transition-colors font-heading tracking-wider"
+              />
+            </form>
+            <p className="text-warm-gray text-sm mt-4">Press Enter to search</p>
+          </div>
         </div>
-      </nav>
-    </header>
+      )}
+    </>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
   );
 }
 
