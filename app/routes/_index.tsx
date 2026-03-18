@@ -74,9 +74,9 @@ function Hero({products}: {products: ShopifyProduct[]}) {
 
   return (
     <section className="relative h-screen overflow-hidden bg-cream">
-      {/* Product Image - positioned on left half but extends under gradient */}
+      {/* Product Image - positioned on left side */}
       <div
-        className="absolute inset-0 md:right-1/3"
+        className="absolute inset-0 md:right-1/2"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -122,9 +122,12 @@ function Hero({products}: {products: ShopifyProduct[]}) {
           />
         )}
 
+        {/* Dark filter overlay on the image */}
+        <div className="absolute inset-0 bg-charcoal/30" />
+
         {/* Gradient overlay: fades image into cream background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-cream hidden md:block" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-cream md:hidden" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cream/50 to-cream hidden md:block" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cream/50 to-cream md:hidden" />
       </div>
 
       {/* Text Content - positioned on right side */}
