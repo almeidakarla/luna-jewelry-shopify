@@ -112,15 +112,6 @@ function Hero({products}: {products: ShopifyProduct[]}) {
         </Link>
       </div>
 
-      {/* Scrollbar Indicator */}
-      {heroImages.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-24 h-0.5 bg-charcoal/20">
-          <div
-            className="absolute h-full w-6 bg-gold transition-all duration-300 ease-out"
-            style={{ left: `${(currentSlide / (heroImages.length - 1)) * (100 - 25)}%` }}
-          />
-        </div>
-      )}
     </section>
   );
 }
