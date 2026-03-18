@@ -112,12 +112,12 @@ function Hero({products}: {products: ShopifyProduct[]}) {
         </Link>
       </div>
 
-      {/* Progress Bar Indicator */}
+      {/* Scrollbar Indicator */}
       {heroImages.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-24 h-0.5 bg-charcoal/20 overflow-hidden">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-24 h-0.5 bg-charcoal/20">
           <div
-            className="h-full bg-gold transition-all duration-300 ease-out"
-            style={{ width: `${((currentSlide + 1) / heroImages.length) * 100}%` }}
+            className="absolute h-full w-6 bg-gold transition-all duration-300 ease-out"
+            style={{ left: `${(currentSlide / (heroImages.length - 1)) * (100 - 25)}%` }}
           />
         </div>
       )}
