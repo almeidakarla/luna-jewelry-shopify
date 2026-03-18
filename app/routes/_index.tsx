@@ -112,7 +112,42 @@ function Hero({products}: {products: ShopifyProduct[]}) {
         </Link>
       </div>
 
+      {/* Carousel Arrow Controls */}
+      {heroImages.length > 1 && (
+        <>
+          <button
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)}
+            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft />
+          </button>
+          <button
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroImages.length)}
+            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
+            aria-label="Next slide"
+          >
+            <ChevronRight />
+          </button>
+        </>
+      )}
     </section>
+  );
+}
+
+function ChevronLeft() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  );
+}
+
+function ChevronRight() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M9 18l6-6-6-6" />
+    </svg>
   );
 }
 
