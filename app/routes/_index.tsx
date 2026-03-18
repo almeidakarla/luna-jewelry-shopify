@@ -70,16 +70,13 @@ function Hero({products}: {products: ShopifyProduct[]}) {
     return () => clearInterval(timer);
   }, [totalSlides]);
 
-  const currentProduct = heroProducts[currentSlide];
-  const primaryImage = currentProduct?.images.edges[0]?.node;
-  const secondaryImage = currentProduct?.images.edges[1]?.node;
   const fallbackImage = 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=1920&q=80';
 
   return (
-    <section className="relative h-screen flex overflow-hidden">
-      {/* Left side: Product Image */}
+    <section className="relative h-screen overflow-hidden bg-cream">
+      {/* Product Image - positioned on left half but extends under gradient */}
       <div
-        className="relative w-full md:w-1/2 h-full"
+        className="absolute inset-0 md:right-1/3"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -130,9 +127,9 @@ function Hero({products}: {products: ShopifyProduct[]}) {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-cream md:hidden" />
       </div>
 
-      {/* Right side: Text Content */}
-      <div className="absolute inset-0 flex items-center justify-center md:relative md:w-1/2 md:bg-cream">
-        <div className="text-center md:text-left px-8 md:px-12 lg:px-16 animate-fade-up">
+      {/* Text Content - positioned on right side */}
+      <div className="relative h-full flex items-center justify-center md:justify-end">
+        <div className="text-center md:text-left px-8 md:pr-16 lg:pr-24 md:w-1/2 animate-fade-up">
           <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl tracking-widest text-charcoal mb-6">
             Timeless Elegance
           </h1>
@@ -145,10 +142,10 @@ function Hero({products}: {products: ShopifyProduct[]}) {
         </div>
       </div>
 
-      {/* Carousel Controls */}
+      {/* Carousel Controls - full width */}
       {totalSlides > 1 && (
         <>
-          {/* Arrow Controls - on the image side */}
+          {/* Arrow Controls - edges of full screen */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides)}
             className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
@@ -158,14 +155,14 @@ function Hero({products}: {products: ShopifyProduct[]}) {
           </button>
           <button
             onClick={() => setCurrentSlide((prev) => (prev + 1) % totalSlides)}
-            className="absolute left-20 md:left-24 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
+            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
             aria-label="Next slide"
           >
             <ChevronRight />
           </button>
 
-          {/* Dot Indicators */}
-          <div className="absolute bottom-8 left-8 md:left-1/4 md:-translate-x-1/2 z-20 flex gap-2">
+          {/* Dot Indicators - centered at bottom */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
             {heroProducts.map((_, index) => (
               <button
                 key={index}
