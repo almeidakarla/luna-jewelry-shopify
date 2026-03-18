@@ -50,123 +50,90 @@ export default function Homepage() {
 
 function Hero({products}: {products: ShopifyProduct[]}) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
 
-  // Get products with at least one image for the hero
-  const heroProducts = products
+  // Get product images for carousel
+  const heroImages = products
     .filter(p => p.images.edges[0]?.node?.url)
-    .slice(0, 5);
-
-  const totalSlides = heroProducts.length;
+    .slice(0, 5)
+    .map(p => ({
+      url: p.images.edges[0].node.url,
+      alt: p.title,
+      handle: p.handle,
+    }));
 
   // Auto-advance carousel
   useEffect(() => {
-    if (totalSlides <= 1) return;
+    if (heroImages.length <= 1) return;
 
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % totalSlides);
-    }, 5000);
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 4000);
 
     return () => clearInterval(timer);
-  }, [totalSlides]);
+  }, [heroImages.length]);
 
+  // Fallback image if no products
   const fallbackImage = 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=1920&q=80';
 
   return (
-    <section className="relative h-screen overflow-hidden bg-cream">
-      {/* Product Image - positioned on left side */}
-      <div
-        className="absolute inset-0 md:right-1/2"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {heroProducts.length > 0 ? (
-          heroProducts.map((product, index) => {
-            const primary = product.images.edges[0]?.node;
-            const secondary = product.images.edges[1]?.node;
-            const showSecondary = isHovered && secondary && index === currentSlide;
+    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-cream z-10" />
 
-            return (
-              <div
-                key={product.id}
-                className={`absolute inset-0 transition-opacity duration-1000 ${
-                  index === currentSlide ? 'opacity-100' : 'opacity-0'
-                }`}
-              >
-                {primary && (
-                  <img
-                    src={primary.url}
-                    alt={primary.altText || product.title}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-                      showSecondary ? 'opacity-0' : 'opacity-100'
-                    }`}
-                  />
-                )}
-                {secondary && (
-                  <img
-                    src={secondary.url}
-                    alt={secondary.altText || `${product.title} - alternate view`}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-                      showSecondary ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  />
-                )}
-              </div>
-            );
-          })
-        ) : (
+      {/* Carousel Images */}
+      {heroImages.length > 0 ? (
+        heroImages.map((image, index) => (
           <img
-            src={fallbackImage}
-            alt="Elegant gold jewelry"
-            className="w-full h-full object-cover"
+            key={index}
+            src={image.url}
+            alt={image.alt}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+              index === currentSlide ? 'opacity-100' : 'opacity-0'
+            }`}
           />
-        )}
+        ))
+      ) : (
+        <img
+          src={fallbackImage}
+          alt="Elegant gold jewelry"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
 
-        {/* Dark filter overlay on the image */}
-        <div className="absolute inset-0 bg-charcoal/30" />
-
-        {/* Gradient overlay: fades image into cream background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cream/50 to-cream hidden md:block" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cream/50 to-cream md:hidden" />
+      {/* Content */}
+      <div className="relative z-20 text-center px-6 animate-fade-up">
+        <h1 className="font-heading text-5xl md:text-7xl tracking-widest text-charcoal mb-6">
+          Timeless Elegance
+        </h1>
+        <p className="font-body text-charcoal/70 text-lg md:text-xl max-w-lg mx-auto mb-10 font-light">
+          Discover handcrafted gold jewelry that celebrates your unique story
+        </p>
+        <Link to="/collections/all" className="btn-secondary">
+          EXPLORE COLLECTION
+        </Link>
       </div>
 
-      {/* Text Content - positioned on right side */}
-      <div className="relative h-full flex items-center justify-center md:justify-end">
-        <div className="text-center md:text-left px-8 md:pr-16 lg:pr-24 md:w-1/2 animate-fade-up">
-          <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl tracking-widest text-charcoal mb-6">
-            Timeless Elegance
-          </h1>
-          <p className="font-body text-charcoal/70 text-lg md:text-xl max-w-md mb-10 font-light">
-            Discover handcrafted gold jewelry that celebrates your unique story
-          </p>
-          <Link to="/collections/all" className="btn-secondary">
-            EXPLORE COLLECTION
-          </Link>
-        </div>
-      </div>
-
-      {/* Carousel Controls - full width */}
-      {totalSlides > 1 && (
+      {/* Carousel Controls */}
+      {heroImages.length > 1 && (
         <>
-          {/* Arrow Controls - edges of full screen */}
+          {/* Arrow Controls */}
           <button
-            onClick={() => setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides)}
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)}
             className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
             aria-label="Previous slide"
           >
             <ChevronLeft />
           </button>
           <button
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % totalSlides)}
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroImages.length)}
             className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
             aria-label="Next slide"
           >
             <ChevronRight />
           </button>
 
-          {/* Dot Indicators - centered at bottom */}
+          {/* Dot Indicators */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-            {heroProducts.map((_, index) => (
+            {heroImages.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
