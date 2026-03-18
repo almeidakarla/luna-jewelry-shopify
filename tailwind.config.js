@@ -10,6 +10,11 @@ export default {
           dark: '#a68a4b',
         },
         cream: '#faf8f5',
+        'cream-dark': '#e8e0d5',
+        beige: {
+          DEFAULT: '#d4c4a8',
+          dark: '#c4b393',
+        },
         charcoal: '#2d2d2d',
         'warm-gray': 'rgb(34, 31, 28)',
       },

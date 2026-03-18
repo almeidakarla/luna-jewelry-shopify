@@ -43,7 +43,7 @@ export default function Homepage() {
       <FeaturedProducts products={products} />
       <BestSellers products={bestSellers} />
       <AboutSection />
-      <Newsletter />
+      <FAQ />
     </>
   );
 }
@@ -220,11 +220,11 @@ function BestSellers({products}: {products: ShopifyProduct[]}) {
   }
 
   return (
-    <section className="section bg-charcoal">
+    <section className="section bg-beige-dark">
       <div className="container-page">
         <div className="page-header">
-          <h2 className="heading-2 text-cream mb-4">Best Sellers</h2>
-          <p className="text-cream/60 font-light">Our most loved pieces</p>
+          <h2 className="heading-2 text-charcoal mb-4">Best Sellers</h2>
+          <p className="text-charcoal/60 font-light">Our most loved pieces</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -234,7 +234,7 @@ function BestSellers({products}: {products: ShopifyProduct[]}) {
         </div>
 
         <div className="text-center mt-12">
-          <Link to="/collections/best-sellers" className="link-underline text-sm tracking-wider text-cream">
+          <Link to="/collections/best-sellers" className="link-underline text-sm tracking-wider text-charcoal">
             View All Best Sellers
           </Link>
         </div>
@@ -253,7 +253,7 @@ function BestSellerCard({product, index}: {product: ShopifyProduct; index: numbe
       className="group animate-fade-up"
       style={{animationDelay: `${index * 100}ms`}}
     >
-      <div className="aspect-square overflow-hidden bg-cream/10 mb-4">
+      <div className="aspect-square overflow-hidden bg-cream mb-4">
         {image ? (
           <img
             src={image.url}
@@ -261,12 +261,12 @@ function BestSellerCard({product, index}: {product: ShopifyProduct; index: numbe
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-cream/50">No image</div>
+          <div className="w-full h-full flex items-center justify-center text-charcoal/50">No image</div>
         )}
       </div>
-      <p className="text-xs text-cream/50 tracking-wider mb-1">{product.productType || 'Jewelry'}</p>
-      <h3 className="font-heading text-lg text-cream mb-1">{product.title}</h3>
-      <p className="text-sm text-gold">{price}</p>
+      <p className="text-xs text-charcoal/50 tracking-wider mb-1">{product.productType || 'Jewelry'}</p>
+      <h3 className="font-heading text-lg text-charcoal mb-1">{product.title}</h3>
+      <p className="text-sm text-gold-dark">{price}</p>
     </Link>
   );
 }
@@ -302,26 +302,76 @@ function AboutSection() {
   );
 }
 
-function Newsletter() {
+function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const faqs = [
+    {
+      question: "What materials do you use?",
+      answer: "We use only ethically sourced 14k and 18k solid gold. Our gemstones are carefully selected for their quality and sourced from responsible suppliers."
+    },
+    {
+      question: "How do I care for my jewelry?",
+      answer: "Store your pieces in a dry place, away from direct sunlight. Clean gently with a soft cloth. Remove jewelry before swimming, showering, or applying perfumes and lotions."
+    },
+    {
+      question: "What is your return policy?",
+      answer: "We offer a 30-day return policy for unworn items in their original packaging. Custom or personalized pieces are final sale."
+    },
+    {
+      question: "Do you offer international shipping?",
+      answer: "Yes! We ship worldwide. Shipping times vary by location, typically 5-10 business days for international orders. All orders are fully insured."
+    },
+    {
+      question: "Can I request a custom design?",
+      answer: "Absolutely! We love creating bespoke pieces. Contact us with your vision, and our artisans will work with you to bring it to life."
+    }
+  ];
+
   return (
     <section className="section bg-cream">
-      <div className="max-w-xl mx-auto text-center">
-        <h2 className="heading-2 mb-4">Join Our World</h2>
-        <p className="text-subtitle mb-8">
-          Be the first to discover new collections and exclusive offers
-        </p>
-        <form className="flex flex-col sm:flex-row gap-4">
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="input flex-1"
-          />
-          <button type="submit" className="btn-primary">
-            SUBSCRIBE
-          </button>
-        </form>
+      <div className="container-page max-w-3xl">
+        <div className="page-header">
+          <h2 className="heading-2 mb-4">Frequently Asked Questions</h2>
+          <p className="text-subtitle">Everything you need to know about Luna Jewelry</p>
+        </div>
+
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <div
+              key={index}
+              className="border border-charcoal/10 bg-white"
+            >
+              <button
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="w-full px-6 py-5 flex items-center justify-between text-left"
+              >
+                <span className="font-heading text-lg text-charcoal">{faq.question}</span>
+                <span className={`transform transition-transform duration-300 ${openIndex === index ? 'rotate-45' : ''}`}>
+                  <PlusIcon />
+                </span>
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ${
+                  openIndex === index ? 'max-h-48 pb-6' : 'max-h-0'
+                }`}
+              >
+                <p className="px-6 text-charcoal/70 leading-relaxed">{faq.answer}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
   );
 }
 
