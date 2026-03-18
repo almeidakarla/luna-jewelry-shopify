@@ -49,62 +49,74 @@ export default function Homepage() {
 }
 
 function Hero({products}: {products: ShopifyProduct[]}) {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentPair, setCurrentPair] = useState(0);
 
-  // Get product images for carousel
-  const heroImages = products
+  // Get products with at least one image for the hero
+  const heroProducts = products
     .filter(p => p.images.edges[0]?.node?.url)
-    .slice(0, 5)
-    .map(p => ({
-      url: p.images.edges[0].node.url,
-      alt: p.title,
-      handle: p.handle,
-    }));
+    .slice(0, 6); // Get 6 products for 3 pairs
+
+  // Group products into pairs
+  const productPairs: ShopifyProduct[][] = [];
+  for (let i = 0; i < heroProducts.length; i += 2) {
+    if (heroProducts[i + 1]) {
+      productPairs.push([heroProducts[i], heroProducts[i + 1]]);
+    } else if (heroProducts[i]) {
+      productPairs.push([heroProducts[i], heroProducts[i]]); // Duplicate if odd number
+    }
+  }
+
+  const totalPairs = productPairs.length;
 
   // Auto-advance carousel
   useEffect(() => {
-    if (heroImages.length <= 1) return;
+    if (totalPairs <= 1) return;
 
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-    }, 4000);
+      setCurrentPair((prev) => (prev + 1) % totalPairs);
+    }, 5000);
 
     return () => clearInterval(timer);
-  }, [heroImages.length]);
+  }, [totalPairs]);
 
   // Fallback image if no products
   const fallbackImage = 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=1920&q=80';
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-cream z-10" />
-
-      {/* Carousel Images */}
-      {heroImages.length > 0 ? (
-        heroImages.map((image, index) => (
+      {/* Background: Two product images side by side */}
+      <div className="absolute inset-0">
+        {productPairs.length > 0 ? (
+          productPairs.map((pair, pairIndex) => (
+            <div
+              key={pairIndex}
+              className={`absolute inset-0 grid grid-cols-2 transition-opacity duration-1000 ${
+                pairIndex === currentPair ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              {pair.map((product, productIndex) => (
+                <HeroProductImage key={`${pairIndex}-${productIndex}`} product={product} />
+              ))}
+            </div>
+          ))
+        ) : (
           <img
-            key={index}
-            src={image.url}
-            alt={image.alt}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
+            src={fallbackImage}
+            alt="Elegant gold jewelry"
+            className="w-full h-full object-cover"
           />
-        ))
-      ) : (
-        <img
-          src={fallbackImage}
-          alt="Elegant gold jewelry"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      )}
+        )}
+      </div>
+
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 via-charcoal/20 to-cream z-10" />
 
       {/* Content */}
       <div className="relative z-20 text-center px-6 animate-fade-up">
-        <h1 className="font-heading text-5xl md:text-7xl tracking-widest text-charcoal mb-6">
+        <h1 className="font-heading text-5xl md:text-7xl tracking-widest text-white drop-shadow-lg mb-6">
           Timeless Elegance
         </h1>
-        <p className="font-body text-charcoal/70 text-lg md:text-xl max-w-lg mx-auto mb-10 font-light">
+        <p className="font-body text-white/90 text-lg md:text-xl max-w-lg mx-auto mb-10 font-light drop-shadow">
           Discover handcrafted gold jewelry that celebrates your unique story
         </p>
         <Link to="/collections/all" className="btn-secondary">
@@ -113,18 +125,18 @@ function Hero({products}: {products: ShopifyProduct[]}) {
       </div>
 
       {/* Carousel Controls */}
-      {heroImages.length > 1 && (
+      {totalPairs > 1 && (
         <>
           {/* Arrow Controls */}
           <button
-            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)}
+            onClick={() => setCurrentPair((prev) => (prev - 1 + totalPairs) % totalPairs)}
             className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
             aria-label="Previous slide"
           >
             <ChevronLeft />
           </button>
           <button
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroImages.length)}
+            onClick={() => setCurrentPair((prev) => (prev + 1) % totalPairs)}
             className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center bg-cream/80 hover:bg-cream text-charcoal transition-all"
             aria-label="Next slide"
           >
@@ -133,12 +145,12 @@ function Hero({products}: {products: ShopifyProduct[]}) {
 
           {/* Dot Indicators */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-            {heroImages.map((_, index) => (
+            {productPairs.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentSlide(index)}
+                onClick={() => setCurrentPair(index)}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentSlide ? 'bg-gold w-6' : 'bg-charcoal/30'
+                  index === currentPair ? 'bg-gold w-6' : 'bg-white/50'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -147,6 +159,45 @@ function Hero({products}: {products: ShopifyProduct[]}) {
         </>
       )}
     </section>
+  );
+}
+
+function HeroProductImage({product}: {product: ShopifyProduct}) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const primaryImage = product.images.edges[0]?.node;
+  const secondaryImage = product.images.edges[1]?.node;
+
+  // Use secondary image on hover if available, otherwise stay on primary
+  const currentImage = isHovered && secondaryImage ? secondaryImage : primaryImage;
+
+  if (!primaryImage) return null;
+
+  return (
+    <div
+      className="relative h-full overflow-hidden cursor-pointer"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Primary Image */}
+      <img
+        src={primaryImage.url}
+        alt={primaryImage.altText || product.title}
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+          isHovered && secondaryImage ? 'opacity-0' : 'opacity-100'
+        }`}
+      />
+      {/* Secondary Image (shown on hover) */}
+      {secondaryImage && (
+        <img
+          src={secondaryImage.url}
+          alt={secondaryImage.altText || `${product.title} - alternate view`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+            isHovered ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      )}
+    </div>
   );
 }
 
