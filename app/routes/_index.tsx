@@ -90,12 +90,16 @@ function Hero({products}: {products: ShopifyProduct[]}) {
           productPairs.map((pair, pairIndex) => (
             <div
               key={pairIndex}
-              className={`absolute inset-0 grid grid-cols-2 transition-opacity duration-1000 ${
+              className={`absolute inset-0 grid grid-cols-1 md:grid-cols-2 transition-opacity duration-1000 ${
                 pairIndex === currentPair ? 'opacity-100' : 'opacity-0'
               }`}
             >
               {pair.map((product, productIndex) => (
-                <HeroProductImage key={`${pairIndex}-${productIndex}`} product={product} />
+                <HeroProductImage
+                  key={`${pairIndex}-${productIndex}`}
+                  product={product}
+                  hideOnMobile={productIndex === 1}
+                />
               ))}
             </div>
           ))
@@ -162,20 +166,19 @@ function Hero({products}: {products: ShopifyProduct[]}) {
   );
 }
 
-function HeroProductImage({product}: {product: ShopifyProduct}) {
+function HeroProductImage({product, hideOnMobile = false}: {product: ShopifyProduct; hideOnMobile?: boolean}) {
   const [isHovered, setIsHovered] = useState(false);
 
   const primaryImage = product.images.edges[0]?.node;
   const secondaryImage = product.images.edges[1]?.node;
 
-  // Use secondary image on hover if available, otherwise stay on primary
-  const currentImage = isHovered && secondaryImage ? secondaryImage : primaryImage;
-
   if (!primaryImage) return null;
 
   return (
     <div
-      className="relative h-full overflow-hidden cursor-pointer"
+      className={`relative h-full overflow-hidden cursor-pointer ${
+        hideOnMobile ? 'hidden md:block' : ''
+      }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
