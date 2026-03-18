@@ -180,9 +180,14 @@ function Footer({menuItems}: {menuItems: MenuItem[]}) {
         {/* Payment Cards & Copyright */}
         <div className="border-t border-cream/10 mt-12 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-xs text-cream/50">
-              &copy; {new Date().getFullYear()} Luna Jewelry. All rights reserved.
-            </p>
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
+              <p className="text-xs text-cream/50">
+                &copy; {new Date().getFullYear()} Luna Jewelry. All rights reserved.
+              </p>
+              <Link to="/privacy" className="text-xs text-cream/50 hover:text-gold transition-colors">
+                Your Privacy Choices
+              </Link>
+            </div>
             <div className="flex items-center gap-3">
               <PaymentAmex />
               <PaymentElo />
