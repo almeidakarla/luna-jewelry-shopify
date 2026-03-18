@@ -113,10 +113,10 @@ function Hero({products}: {products: ShopifyProduct[]}) {
 
       {/* Content */}
       <div className="relative z-20 text-center px-6 animate-fade-up">
-        <h1 className="font-heading text-5xl md:text-7xl tracking-widest text-white drop-shadow-lg mb-6">
+        <h1 className="font-heading text-5xl md:text-7xl tracking-widest text-charcoal mb-6">
           Timeless Elegance
         </h1>
-        <p className="font-body text-white/90 text-lg md:text-xl max-w-lg mx-auto mb-10 font-light drop-shadow">
+        <p className="font-body text-gray-600 text-lg md:text-xl max-w-lg mx-auto mb-10 font-light">
           Discover handcrafted gold jewelry that celebrates your unique story
         </p>
         <Link to="/collections/all" className="btn-secondary">
