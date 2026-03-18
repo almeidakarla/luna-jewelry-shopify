@@ -1,7 +1,7 @@
 import {Link, useLoaderData} from '@remix-run/react';
 import type {MetaFunction} from '@remix-run/node';
 import {useState, useEffect} from 'react';
-import {shopifyFetch, PRODUCTS_QUERY, formatPrice, type ProductsResponse, type ShopifyProduct} from '~/lib/shopify';
+import {shopifyFetch, PRODUCTS_QUERY, COLLECTION_BY_HANDLE_QUERY, formatPrice, type ProductsResponse, type CollectionResponse, type ShopifyProduct} from '~/lib/shopify';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Luna Jewelry | Timeless Elegance'}];
@@ -9,22 +9,39 @@ export const meta: MetaFunction = () => {
 
 export async function loader() {
   try {
-    const data = await shopifyFetch<ProductsResponse>(PRODUCTS_QUERY, {first: 12});
-    const products = data.products.edges.map(edge => edge.node);
-    return {products, error: null};
+    // Fetch all products for featured section and hero
+    const productsData = await shopifyFetch<ProductsResponse>(PRODUCTS_QUERY, {first: 12});
+    const products = productsData.products.edges.map(edge => edge.node);
+
+    // Fetch best sellers collection
+    let bestSellers: ShopifyProduct[] = [];
+    try {
+      const bestSellersData = await shopifyFetch<CollectionResponse>(COLLECTION_BY_HANDLE_QUERY, {
+        handle: 'best-sellers',
+        first: 4,
+      });
+      if (bestSellersData.collectionByHandle) {
+        bestSellers = bestSellersData.collectionByHandle.products.edges.map(edge => edge.node);
+      }
+    } catch (e) {
+      console.error('Best sellers collection not found');
+    }
+
+    return {products, bestSellers, error: null};
   } catch (error) {
     console.error('Failed to fetch products:', error);
-    return {products: [], error: 'Failed to load products'};
+    return {products: [], bestSellers: [], error: 'Failed to load products'};
   }
 }
 
 export default function Homepage() {
-  const {products} = useLoaderData<typeof loader>();
+  const {products, bestSellers} = useLoaderData<typeof loader>();
 
   return (
     <>
       <Hero products={products} />
       <FeaturedProducts products={products} />
+      <BestSellers products={bestSellers} />
       <AboutSection />
       <Newsletter />
     </>
@@ -193,6 +210,63 @@ function ProductCard({product, index}: {product: ShopifyProduct; index: number})
       <p className="text-label mb-1">{product.productType || 'Jewelry'}</p>
       <h3 className="product-title">{product.title}</h3>
       <p className="product-price">{price}</p>
+    </Link>
+  );
+}
+
+function BestSellers({products}: {products: ShopifyProduct[]}) {
+  if (products.length === 0) {
+    return null; // Don't show section if no best sellers collection exists
+  }
+
+  return (
+    <section className="section bg-charcoal">
+      <div className="container-page">
+        <div className="page-header">
+          <h2 className="heading-2 text-cream mb-4">Best Sellers</h2>
+          <p className="text-cream/60 font-light">Our most loved pieces</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {products.map((product, index) => (
+            <BestSellerCard key={product.id} product={product} index={index} />
+          ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <Link to="/collections/best-sellers" className="link-underline text-sm tracking-wider text-cream">
+            View All Best Sellers
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BestSellerCard({product, index}: {product: ShopifyProduct; index: number}) {
+  const image = product.images.edges[0]?.node;
+  const price = formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode);
+
+  return (
+    <Link
+      to={`/products/${product.handle}`}
+      className="group animate-fade-up"
+      style={{animationDelay: `${index * 100}ms`}}
+    >
+      <div className="aspect-square overflow-hidden bg-cream/10 mb-4">
+        {image ? (
+          <img
+            src={image.url}
+            alt={image.altText || product.title}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-cream/50">No image</div>
+        )}
+      </div>
+      <p className="text-xs text-cream/50 tracking-wider mb-1">{product.productType || 'Jewelry'}</p>
+      <h3 className="font-heading text-lg text-cream mb-1">{product.title}</h3>
+      <p className="text-sm text-gold">{price}</p>
     </Link>
   );
 }

@@ -57,3 +57,7 @@ export default function App() {
     </html>
   );
 }
+
+export const links = () => [
+  { rel: "icon", href: "/favicon.png" },
+];
