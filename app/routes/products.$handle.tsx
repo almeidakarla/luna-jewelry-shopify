@@ -1,4 +1,4 @@
-import {Link, useLoaderData} from '@remix-run/react';
+import {Link, useLoaderData, useNavigate} from '@remix-run/react';
 import type {LoaderFunctionArgs, MetaFunction} from '@remix-run/node';
 import {useState} from 'react';
 import {
@@ -36,8 +36,11 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
   const {addToCart} = useCart();
+  const navigate = useNavigate();
 
   const images = product.images.edges.map(edge => edge.node);
+  const variants = product.variants.edges.map(edge => edge.node);
+  const selectedVariant = variants[0]; // Default to first variant
   const price = formatPrice(
     product.priceRange.minVariantPrice.amount,
     product.priceRange.minVariantPrice.currencyCode
@@ -45,8 +48,11 @@ export default function ProductPage() {
   const numericPrice = parseFloat(product.priceRange.minVariantPrice.amount);
 
   const handleAddToCart = () => {
+    if (!selectedVariant) return;
+
     addToCart({
       id: product.id,
+      variantId: selectedVariant.id,
       handle: product.handle,
       name: product.title,
       price: numericPrice,
@@ -146,12 +152,23 @@ export default function ProductPage() {
                 : `ADD TO CART — ${formatPrice((numericPrice * quantity).toString(), product.priceRange.minVariantPrice.currencyCode)}`}
             </button>
 
-            <Link
-              to="/cart"
-              className="block w-full py-4 border border-charcoal text-center text-sm tracking-widest hover:bg-charcoal hover:text-cream transition-all"
+            <button
+              onClick={() => {
+                if (!selectedVariant) return;
+                addToCart({
+                  id: product.id,
+                  variantId: selectedVariant.id,
+                  handle: product.handle,
+                  name: product.title,
+                  price: numericPrice,
+                  image: images[0]?.url || '',
+                }, quantity);
+                navigate('/cart');
+              }}
+              className="w-full py-4 border border-charcoal text-center text-sm tracking-widest hover:bg-charcoal hover:text-cream transition-all"
             >
               BUY NOW
-            </Link>
+            </button>
 
             {/* Details */}
             <div className="mt-12 pt-8 border-t border-charcoal/10">

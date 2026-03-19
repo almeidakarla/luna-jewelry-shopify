@@ -270,6 +270,72 @@ export function formatPrice(amount: string, currencyCode: string = 'USD'): strin
   }).format(parseFloat(amount));
 }
 
+// Cart types
+export interface CartLineInput {
+  merchandiseId: string; // Variant ID
+  quantity: number;
+}
+
+export interface ShopifyCart {
+  id: string;
+  checkoutUrl: string;
+  totalQuantity: number;
+  cost: {
+    totalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+  };
+}
+
+export interface CartCreateResponse {
+  cartCreate: {
+    cart: ShopifyCart | null;
+    userErrors: Array<{
+      field: string[];
+      message: string;
+    }>;
+  };
+}
+
+// Cart mutations
+export const CART_CREATE_MUTATION = `
+  mutation CartCreate($lines: [CartLineInput!]!) {
+    cartCreate(input: { lines: $lines }) {
+      cart {
+        id
+        checkoutUrl
+        totalQuantity
+        cost {
+          totalAmount {
+            amount
+            currencyCode
+          }
+        }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+// Create a Shopify cart and return checkout URL
+export async function createShopifyCart(lines: CartLineInput[]): Promise<string> {
+  const data = await shopifyFetch<CartCreateResponse>(CART_CREATE_MUTATION, { lines });
+
+  if (data.cartCreate.userErrors.length > 0) {
+    throw new Error(data.cartCreate.userErrors[0].message);
+  }
+
+  if (!data.cartCreate.cart) {
+    throw new Error('Failed to create cart');
+  }
+
+  return data.cartCreate.cart.checkoutUrl;
+}
+
 // Helper to convert Shopify URLs to relative paths
 export function shopifyUrlToPath(url: string): string {
   try {

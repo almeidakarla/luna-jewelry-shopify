@@ -1,5 +1,6 @@
 import {Link} from '@remix-run/react';
 import type {MetaFunction} from '@remix-run/node';
+import {useState} from 'react';
 import {useCart} from '~/contexts/CartContext';
 
 export const meta: MetaFunction = () => {
@@ -7,10 +8,48 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Cart() {
-  const {items: cartItems, updateQuantity, removeFromCart, subtotal} = useCart();
+  const {items: cartItems, updateQuantity, removeFromCart, subtotal, clearCart} = useCart();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   const shipping = subtotal > 250 ? 0 : 15;
   const total = subtotal + shipping;
+
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) return;
+
+    setIsCheckingOut(true);
+    setCheckoutError(null);
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: cartItems.map(item => ({
+            variantId: item.variantId,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Checkout failed');
+      }
+
+      // Clear cart and redirect to Shopify checkout
+      clearCart();
+      window.location.href = data.checkoutUrl;
+    } catch (error) {
+      console.error('Checkout error:', error);
+      setCheckoutError(error instanceof Error ? error.message : 'Checkout failed');
+      setIsCheckingOut(false);
+    }
+  };
 
   return (
     <div className="pt-24 min-h-screen">
@@ -99,8 +138,15 @@ export default function Cart() {
                     <span className="text-charcoal">${total.toFixed(2)}</span>
                   </div>
                 </div>
-                <button className="w-full mt-6 py-4 bg-charcoal text-cream text-sm tracking-widest hover:bg-gold transition-colors">
-                  CHECKOUT
+                {checkoutError && (
+                  <p className="text-red-600 text-sm mb-4">{checkoutError}</p>
+                )}
+                <button
+                  onClick={handleCheckout}
+                  disabled={isCheckingOut || cartItems.length === 0}
+                  className="w-full mt-6 py-4 bg-charcoal text-cream text-sm tracking-widest hover:bg-gold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isCheckingOut ? 'REDIRECTING...' : 'CHECKOUT'}
                 </button>
                 <Link
                   to="/collections/all"
