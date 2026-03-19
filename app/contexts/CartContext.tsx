@@ -29,12 +29,20 @@ export function CartProvider({children}: {children: ReactNode}) {
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Load cart from localStorage on mount (client-side only)
+  // Also migrate old cart items that don't have variantId
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(CART_STORAGE_KEY);
       if (stored) {
         try {
-          setItems(JSON.parse(stored));
+          const parsedItems = JSON.parse(stored) as CartItem[];
+          // Filter out items without variantId (old format)
+          const validItems = parsedItems.filter(item => item.variantId);
+          if (validItems.length !== parsedItems.length) {
+            // Some items were invalid, clear them
+            console.log('Cleared old cart items without variantId');
+          }
+          setItems(validItems);
         } catch (e) {
           console.error('Failed to parse cart from localStorage:', e);
         }
