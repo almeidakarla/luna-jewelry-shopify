@@ -1,40 +1,14 @@
 import {Link} from '@remix-run/react';
 import type {MetaFunction} from '@remix-run/node';
-import {useState} from 'react';
+import {useCart} from '~/contexts/CartContext';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Shopping Cart | Luna Jewelry'}];
 };
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
-
-// Cart starts empty - items are added when user clicks "Add to Cart"
-const INITIAL_CART_ITEMS: CartItem[] = [];
-
 export default function Cart() {
-  const [cartItems, setCartItems] = useState<CartItem[]>(INITIAL_CART_ITEMS);
+  const {items: cartItems, updateQuantity, removeFromCart, subtotal} = useCart();
 
-  const updateQuantity = (id: string, newQuantity: number) => {
-    if (newQuantity < 1) {
-      setCartItems(cartItems.filter(item => item.id !== id));
-    } else {
-      setCartItems(cartItems.map(item =>
-        item.id === id ? {...item, quantity: newQuantity} : item
-      ));
-    }
-  };
-
-  const removeItem = (id: string) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  };
-
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = subtotal > 250 ? 0 : 15;
   const total = subtotal + shipping;
 
@@ -54,7 +28,7 @@ export default function Cart() {
                   key={item.id}
                   className="flex gap-6 pb-6 border-b border-charcoal/10 animate-fade-up"
                 >
-                  <Link to={`/products/${item.id}`} className="shrink-0">
+                  <Link to={`/products/${item.handle}`} className="shrink-0">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -64,20 +38,20 @@ export default function Cart() {
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <Link
-                        to={`/products/${item.id}`}
+                        to={`/products/${item.handle}`}
                         className="font-heading text-lg text-charcoal hover:text-gold transition-colors"
                       >
                         {item.name}
                       </Link>
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeFromCart(item.id)}
                         className="text-warm-gray hover:text-charcoal transition-colors"
                         aria-label="Remove item"
                       >
                         <CloseIcon />
                       </button>
                     </div>
-                    <p className="text-charcoal mt-1">${item.price}</p>
+                    <p className="text-charcoal mt-1">${item.price.toFixed(2)}</p>
                     <div className="flex items-center gap-3 mt-4">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
@@ -107,12 +81,12 @@ export default function Cart() {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-warm-gray">Subtotal</span>
-                    <span className="text-charcoal">${subtotal}</span>
+                    <span className="text-charcoal">${subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-warm-gray">Shipping</span>
                     <span className="text-charcoal">
-                      {shipping === 0 ? 'Free' : `$${shipping}`}
+                      {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
                     </span>
                   </div>
                   {shipping > 0 && (
@@ -122,7 +96,7 @@ export default function Cart() {
                   )}
                   <div className="pt-4 border-t border-charcoal/10 flex justify-between font-medium">
                     <span className="text-charcoal">Total</span>
-                    <span className="text-charcoal">${total}</span>
+                    <span className="text-charcoal">${total.toFixed(2)}</span>
                   </div>
                 </div>
                 <button className="w-full mt-6 py-4 bg-charcoal text-cream text-sm tracking-widest hover:bg-gold transition-colors">

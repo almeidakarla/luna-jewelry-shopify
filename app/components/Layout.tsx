@@ -1,6 +1,7 @@
 import {Link, useNavigate} from '@remix-run/react';
 import {useState, type ReactNode} from 'react';
 import {shopifyUrlToPath, type MenuItem} from '~/lib/shopify';
+import {useCart} from '~/contexts/CartContext';
 
 interface LayoutProps {
   children: ReactNode;
@@ -41,6 +42,7 @@ function Header({menuItems}: {menuItems: MenuItem[]}) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const {itemCount} = useCart();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,8 +93,13 @@ function Header({menuItems}: {menuItems: MenuItem[]}) {
               <SearchIcon />
             </button>
           )}
-          <Link to="/cart" aria-label="Cart" className="nav-icon">
+          <Link to="/cart" aria-label="Cart" className="nav-icon relative">
             <CartIcon />
+            {itemCount > 0 && (
+              <span className="absolute -top-2 -right-2 w-5 h-5 bg-gold text-charcoal text-xs font-medium rounded-full flex items-center justify-center">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
           </Link>
         </div>
       </nav>

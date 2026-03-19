@@ -7,6 +7,7 @@ import {
   useLoaderData,
 } from '@remix-run/react';
 import {Layout} from '~/components/Layout';
+import {CartProvider} from '~/contexts/CartContext';
 import {shopifyFetch, MENU_QUERY, type MenuResponse, type MenuItem} from '~/lib/shopify';
 import './styles/tailwind.css';
 
@@ -48,9 +49,11 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Layout headerMenu={headerMenu} footerMenu={footerMenu}>
-          <Outlet />
-        </Layout>
+        <CartProvider>
+          <Layout headerMenu={headerMenu} footerMenu={footerMenu}>
+            <Outlet />
+          </Layout>
+        </CartProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

@@ -7,6 +7,7 @@ import {
   formatPrice,
   type ProductResponse,
 } from '~/lib/shopify';
+import {useCart} from '~/contexts/CartContext';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `${data?.product?.title || 'Product'} | Luna Jewelry`}];
@@ -33,6 +34,8 @@ export default function ProductPage() {
   const {product} = useLoaderData<typeof loader>();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const {addToCart} = useCart();
 
   const images = product.images.edges.map(edge => edge.node);
   const price = formatPrice(
@@ -40,6 +43,19 @@ export default function ProductPage() {
     product.priceRange.minVariantPrice.currencyCode
   );
   const numericPrice = parseFloat(product.priceRange.minVariantPrice.amount);
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: product.id,
+      handle: product.handle,
+      name: product.title,
+      price: numericPrice,
+      image: images[0]?.url || '',
+    }, quantity);
+
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
 
   return (
     <div className="pt-24">
@@ -117,8 +133,17 @@ export default function ProductPage() {
             </div>
 
             {/* Add to Cart */}
-            <button className="w-full py-4 bg-charcoal text-cream text-sm tracking-widest hover:bg-gold transition-colors mb-4">
-              ADD TO CART — {formatPrice((numericPrice * quantity).toString(), product.priceRange.minVariantPrice.currencyCode)}
+            <button
+              onClick={handleAddToCart}
+              className={`w-full py-4 text-sm tracking-widest transition-colors mb-4 ${
+                addedToCart
+                  ? 'bg-gold text-charcoal'
+                  : 'bg-charcoal text-cream hover:bg-gold'
+              }`}
+            >
+              {addedToCart
+                ? 'ADDED TO CART!'
+                : `ADD TO CART — ${formatPrice((numericPrice * quantity).toString(), product.priceRange.minVariantPrice.currencyCode)}`}
             </button>
 
             <Link
